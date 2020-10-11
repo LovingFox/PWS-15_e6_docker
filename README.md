@@ -12,6 +12,20 @@ https://sf.rtru.tk/fibonacci
   - web_server
   - redis_server
 
-### Установка и запуск
-- docker-compose build
-- docker-compose up
+### Установка
+- скачать проект и перейти в директорию проекта
+```
+$ git clone https://github.com/LovingFox/PWS-15_e6_docker
+$ cd PWS-15_e6_docker
+```
+- собрать контейнеры
+```
+$ docker-compose build
+```
+- запустить контейнеры
+```
+$ docker-compose up
+```
+
+## Использование
+http://127.0.0.1:5000/fibonacci
