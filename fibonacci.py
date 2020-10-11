@@ -32,7 +32,7 @@ page = """
   <a href="{location.main}?n=300">fibonacci(300)</a><br>
   <hr>
   ... or type custom ({maximum} maximum due to recursion restrictions):<br>
-  <form method="get" action="{location}">
+  <form method="get" action="{location.main}">
     <input type="number" name="n" min="1" max="{maximum}" value="{value}"><br>
     <button>Submit</button>
   </form>
