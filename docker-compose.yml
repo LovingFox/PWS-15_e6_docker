@@ -1,0 +1,15 @@
+version: "3.8"
+services:
+  web_server:
+    build: .
+    ports:
+      - "5000:5000"
+    volumes:
+      - .:/app
+    environment:
+      FLASK_ENV: production
+    links:
+      - redis_server
+  redis_server:
+    image: "redis:6.0.8-alpine"
+
