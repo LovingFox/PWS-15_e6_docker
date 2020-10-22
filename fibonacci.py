@@ -12,6 +12,11 @@ class location():
     main  = '/fibonacci'         # точка входа
     clear = main + '/clear'      # точка для сброс кэша
 
+class result():
+    def __init__(self, size, fib):
+        self.c = size
+        self.f = fib
+
 redis_prefix = 'fib_'            # префикс для сохранения значений в redis
 MAX_N = 500                      # ограничение из-за рекурсии
 
@@ -40,7 +45,9 @@ page = """
     <button>Clear cache</button>
   </form>
   <hr>
-{result}
+{result.c}
+<hr>
+{result.f}
 </body>
 </html>
 """
@@ -74,7 +81,8 @@ def fib_calc(n):
     except Exception as e:
         return str(e)
     else:
-        return f'fibonacci({n}) = {res}<br>calcs without cache: {calc}'
+        return result(cache_size(),
+                f'fibonacci({n}) = {res}<br>calcs without cache: {calc}')
 
 
 def clear_cache():
@@ -87,22 +95,32 @@ def clear_cache():
         return None
 
 
+def cache_size():
+    try:
+        cache = redis.Redis(host=REDIS_HOST, port=REDIS_PORT)
+        size = len(cache.keys(redis_prefix+'*'))
+    except Exception as e:
+        return str(e)
+    else:
+        return f'Cache size: {size}'
+
+
 @app.route(location.main)
 def fib_html():
     n = request.args.get('n')
     if not n:
         return page.format(location=location, maximum=MAX_N, value=MAX_N,
-                result='')
+            result=result(cache_size(), ''))
     else:
         try:
             n = int(n)
         except ValueError:
             return page.format(location=location, maximum=MAX_N, value=MAX_N,
-                    result='Incorrect number')
+                result=result(cache_size(), 'Incorrect number'))
         else:
-            if n<1 or n>1000:
+            if n<1 or n>MAX_N:
                 return page.format(location=location, maximum=MAX_N, value=MAX_N,
-                        result='Number is out of range')
+                    result=result(cache_size(), 'Number is out of range'))
 
     return page.format(location=location, maximum=MAX_N, value=n,
             result=fib_calc(n))
@@ -113,10 +131,10 @@ def clear_html():
     error = clear_cache()
     if not error:
         return page.format(location=location, maximum=MAX_N, value=MAX_N,
-                result='Cache cleared')
+                result=result(cache_size(), 'Cache cleared'))
     else:
         return page.format(location=location, maximum=MAX_N, value=MAX_N,
-                result=error)
+                result=result(error, ''))
 
 
 if __name__ == '__main__':
